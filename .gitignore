@@ -1,0 +1,74 @@
+# ========================
+# Raiz e Docker
+# ========================
+.env
+.env.*
+docker-data/
+postgres-data/
+pgdata/
+db-data/
+*.log
+
+# ========================
+# Frontend Web (Next.js / Node)
+# ========================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.env
+frontend/.env.*
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# ========================
+# Mobile App (Expo / React Native)
+# ========================
+mobile/node_modules/
+mobile/.expo/
+mobile/dist/
+mobile/npm-debug.*
+mobile/*.jks
+mobile/*.p8
+mobile/*.p12
+mobile/*.key
+mobile/*.mobileprovision
+mobile/*.orig.*
+mobile/web-build/
+mobile/android/
+mobile/ios/
+mobile/.env
+mobile/.env.*
+
+# ========================
+# Backend (Python / FastAPI)
+# ========================
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/.env
+backend/venv/
+backend/.venv/
+backend/env/
+
+# ========================
+# Banco de Dados e Uploads Locais
+# ========================
+backend/uploads/
+*.db
+*.sqlite3
+
+# ========================
+# OS & IDEs
+# ========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
