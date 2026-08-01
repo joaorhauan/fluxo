@@ -1,5 +1,4 @@
 import io
-import pandas as pd
 from datetime import date, timedelta
 from calendar import monthrange
 from fastapi import APIRouter, Depends, Query, HTTPException
