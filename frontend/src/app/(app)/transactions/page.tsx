@@ -185,7 +185,7 @@ export default function TransactionsPage() {
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs text-gray-500">{t.date}</span>
                     {t.category_name && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: `${t.category_color}20`, color: t.category_color }}>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: t.category_color ? `${t.category_color}20` : undefined, color: t.category_color ?? undefined }}>
                         {t.category_name}
                       </span>
                     )}
