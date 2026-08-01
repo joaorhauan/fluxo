@@ -26,3 +26,8 @@ async def startup():
 @app.get("/")
 def root():
     return {"app": settings.APP_NAME, "status": "online"}
+
+@app.head("/")
+def test():
+    return {"app": settings.APP_NAME, "status": "online"}
+
