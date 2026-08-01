@@ -6,7 +6,7 @@ import { Transaction, Category, Account } from "@/lib/types";
 
 const EMPTY_TX = {
   type: "expense", amount: "", description: "", date: new Date().toISOString().slice(0, 10),
-  due_date: "", account_id: "", category_id: "", installments: "1", recurrence: "none", is_paid: true, notes: ""
+  due_date: "", account_id: "", destination_account_id: "", category_id: "", installments: "1", recurrence: "none", is_paid: true, notes: ""
 };
 
 export default function TransactionsPage() {
@@ -53,6 +53,7 @@ export default function TransactionsPage() {
     setTxForm({
       type: t.type, amount: String(t.amount), description: t.description,
       date: t.date, due_date: t.due_date || "", account_id: String(t.account_id),
+      destination_account_id: (t as any).destination_account_id ? String((t as any).destination_account_id) : "",
       category_id: t.category_id ? String(t.category_id) : "",
       installments: "1", recurrence: t.recurrence || "none",
       is_paid: t.is_paid, notes: t.notes || "",
@@ -69,12 +70,15 @@ export default function TransactionsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!txForm.amount || !txForm.description || !txForm.account_id) { alert("Preencha o valor, descrição e conta."); return; }
+    if (txForm.type === "transfer" && !txForm.destination_account_id) { alert("Preencha a conta de destino para a transferência."); return; }
+    
     try {
       const payload = {
         type: txForm.type, amount: parseFloat(txForm.amount.replace(",", ".")),
         description: txForm.description, date: txForm.date,
         due_date: txForm.due_date || null, account_id: Number(txForm.account_id),
-        category_id: txForm.category_id ? Number(txForm.category_id) : null,
+        destination_account_id: txForm.type === "transfer" ? Number(txForm.destination_account_id) : null,
+        category_id: txForm.type !== "transfer" && txForm.category_id ? Number(txForm.category_id) : null,
         installments: parseInt(txForm.installments || "1"),
         recurrence: txForm.recurrence, is_paid: txForm.is_paid, notes: txForm.notes || null,
       };
@@ -262,11 +266,22 @@ export default function TransactionsPage() {
                 </div>
               </div>
               {!editingTx && (
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">Conta *</label>
-                  <select value={txForm.account_id} onChange={(e) => setTxForm({ ...txForm, account_id: e.target.value })} className={inputCls} required>
-                    {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
-                  </select>
+                <div className={txForm.type === "transfer" ? "grid grid-cols-2 gap-3" : ""}>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{txForm.type === "transfer" ? "Conta Origem *" : "Conta *"}</label>
+                    <select value={txForm.account_id} onChange={(e) => setTxForm({ ...txForm, account_id: e.target.value })} className={inputCls} required>
+                      {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
+                    </select>
+                  </div>
+                  {txForm.type === "transfer" && (
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Conta Destino *</label>
+                      <select value={txForm.destination_account_id} onChange={(e) => setTxForm({ ...txForm, destination_account_id: e.target.value })} className={inputCls} required>
+                        <option value="">Selecione...</option>
+                        {accounts.filter(a => String(a.id) !== txForm.account_id).map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
+                      </select>
+                    </div>
+                  )}
                 </div>
               )}
               {txForm.type !== "transfer" && (
