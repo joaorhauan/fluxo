@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "scheme": "fluxo",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": true
     },
