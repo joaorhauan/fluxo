@@ -1,34 +1,31 @@
-# ===== backend/main.py =====
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.database import Base, engine
-from app.api import auth, accounts, categories, transactions, goals, reports, budgets
+from app.core.config import settings
+from app.core.database import get_db
+from app.api import auth, accounts, categories, transactions, goals, reports
 
 app = FastAPI(title="Fluxo API", version="1.0.0")
 
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Incluindo os routers da aplicação
-app.include_router(auth.router, prefix="/api")
-app.include_router(accounts.router, prefix="/api")
-app.include_router(categories.router, prefix="/api")
-app.include_router(transactions.router, prefix="/api")
-app.include_router(goals.router, prefix="/api")
-app.include_router(reports.router, prefix="/api")
-app.include_router(budgets.router, prefix="/api")
+for router in [auth.router, accounts.router, categories.router, transactions.router, goals.router, reports.router]:
+    app.include_router(router, prefix="/api")
 
 @app.on_event("startup")
 async def startup():
-    async with engine.begin() as conn:
-        # Cria as tabelas no banco de dados caso não existam (incluindo a nova tabela budgets)
-        await conn.run_sync(Base.metadata.create_all)
+    from app.core.seed import seed_categories
+    async with __import__('app.core.database', fromlist=['SessionLocal']).SessionLocal() as db:
+        await seed_categories(db)
 
 @app.get("/")
 def root():
-    return {"message": "API Fluxo rodando com sucesso!"}
+    return {"app": settings.APP_NAME, "status": "online"}
