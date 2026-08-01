@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-const BASE_URL = "http://192.168.0.13:8000/api";
+const BASE_URL = "https://fluxo-api-0u0q.onrender.com/api";
 
 const api = axios.create({ baseURL: BASE_URL });
 
