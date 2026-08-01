@@ -1,7 +1,5 @@
 import os
 from pydantic_settings import BaseSettings
-from pydantic import field_validator
-from typing import Any
 
 class Settings(BaseSettings):
     APP_NAME: str = "Fluxo"
@@ -11,24 +9,13 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "troque-em-producao"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 525600
-    ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
-
-    @field_validator("ALLOWED_ORIGINS", mode="before")
-    @classmethod
-    def parse_origins(cls, v: Any) -> list[str]:
-        if isinstance(v, str):
-            v = v.strip()
-            if v.startswith("["):
-                import json
-                try:
-                    return json.loads(v)
-                except Exception:
-                    pass
-            return [o.strip() for o in v.split(",")]
-        return v
 
     class Config:
         env_file = ".env"
         case_sensitive = True
 
 settings = Settings()
+
+def get_allowed_origins() -> list[str]:
+    raw = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000")
+    return [o.strip() for o in raw.split(",")]
