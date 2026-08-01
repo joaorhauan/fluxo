@@ -37,19 +37,28 @@ export default function TransactionModal({ accounts, defaultType = "expense", on
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (form.type === "expense" && !form.category_id) {
       setError("Categoria é obrigatória para despesas");
       return;
     }
+    
+    if (form.type === "transfer" && !form.destination_account_id) {
+      setError("Conta de destino é obrigatória para transferências");
+      return;
+    }
+
     setLoading(true);
     setError("");
+    
     try {
       await api.post("/transactions/", {
         ...form,
         amount: parseFloat(form.amount),
         account_id: Number(form.account_id),
-        destination_account_id: form.destination_account_id ? Number(form.destination_account_id) : null,
-        category_id: form.category_id ? Number(form.category_id) : null,
+        // Garante que destination_account_id só é enviado em transferências, prevenindo erros na API
+        destination_account_id: form.type === "transfer" ? Number(form.destination_account_id) : null,
+        category_id: form.type === "transfer" ? null : (form.category_id ? Number(form.category_id) : null),
         installments: Number(form.installments),
         due_date: form.due_date || null,
         notes: form.notes || null,
